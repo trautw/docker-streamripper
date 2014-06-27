@@ -12,4 +12,6 @@ RUN apt-get install -y streamripper
 
 RUN echo root:`dd if=/dev/urandom count=250 2>/dev/null | sha1sum | tail -n 1 | cut -f1 -d\ ` |chpasswd
 
-CMD streamripper http://stream.chaos-radio.net:5678/ -k 2 -o always --quiet
+ADD /sr /usr/local/bin/sr
+
+CMD /usr/local/bin/sr

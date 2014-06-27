@@ -1,0 +1,83 @@
+#!/bin/sh
+# set -x
+
+# SRDIR=$HOME/Projekte/Musik/streamripper
+# SRDIR=/Pack/streamrippernew
+
+. /volume/config/sr.conf
+
+killall () {
+  SIGNAL="$1"
+  STRING="$2"
+  # echo Killall "$STRING"
+  PIDS=`ps axww | grep "$STRING" | grep -v grep | awk '{ print $1 }' `
+  if [ "A$PIDS" != "A" ]; then
+    # echo Killing $PIDS
+    kill $SIGNAL $PIDS
+  fi
+}
+
+check() {
+  cd $SRDIR
+  find . -maxdepth 1 -type d | while read DIR; do
+    URLFILE="$DIR/URL"
+    if [ -f "$URLFILE" ]; then
+      find "$DIR" -cmin -15 | grep mp3 >/dev/null 2>&1
+      RESULT=$?
+      if [ $RESULT = 1 ]; then
+        # echo Restarting  "$DIR"
+        stop4dir "$DIR"
+        start4dir "$DIR"
+      fi
+    fi
+  done
+}
+
+stop4dir () {
+  DIR="$1"
+  # echo Stopping  "$DIR"
+  URL=`cat "$URLFILE"| head -1`
+  killall -15 "`echo $URL | cut -f3 -d/`"
+  sleep 15
+  killall -9 "`echo $URL | cut -f3 -d/`"
+  /bin/rm -rf "$DIR/incomplete"
+  mkdir "$DIR/incomplete"
+}
+
+stop () {
+  cd $SRDIR
+  find . -maxdepth 1 -type d | while read DIR; do
+    URLFILE="$DIR/URL"
+    if [ -f "$URLFILE" ]; then
+      stop4dir "$DIR"
+    fi
+  done
+}
+
+
+startstream () {
+  NAME="$1"
+  URL="$2"
+  DIR="$DATADIR/$NAME"
+  echo "Starting DIR=$DIR URL=$URL"
+  mkdir -p "$DIR"
+  cd "$DIR"
+  nohup streamripper "$URL" -s -d "$DIR" -k 2 -o always --quiet &
+}
+
+start () {
+  cd "$CONFDIR"
+  for STREAM in  *.urls; do
+    ls -la
+    ls -l "$STREAM"
+    echo "A${STREAM}A"
+    . "$CONFDIR/$STREAM"
+    startstream "$NAME" "$URL"
+  done
+}
+
+start
+while true; do
+  date
+  sleep 60
+done
