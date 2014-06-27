@@ -116,6 +116,11 @@ EOM"
     run "#{$docker} run --rm --volumes-from #{$data_container_name} busybox chown -R default:default #{$data_dir}", verbose: false
   end
 
+  desc 'data_container_cleanup', 'Cleanup data container'
+  def data_container_cleanup
+    run "#{$docker} run --rm --volumes-from #{$config_container_name} --volumes-from #{$data_container_name} #{$app_image} /bin/sh -c /usr/local/bin/cleanup-data"
+  end
+
   desc 'data_container_shell', 'Shell to data container'
   def data_container_shell
     run "#{$docker} run --interactive=true --tty=true --rm --workdir=#{$data_dir} --volumes-from #{$data_container_name} busybox /bin/sh"

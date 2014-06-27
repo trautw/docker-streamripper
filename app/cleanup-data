@@ -1,0 +1,5 @@
+#/bin/sh
+#
+# logrotate
+ls -la
+echo Logrotate simulation done

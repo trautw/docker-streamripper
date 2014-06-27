@@ -12,6 +12,7 @@ RUN apt-get install -y streamripper
 
 RUN echo root:`dd if=/dev/urandom count=250 2>/dev/null | sha1sum | tail -n 1 | cut -f1 -d\ ` |chpasswd
 
-ADD /sr /usr/local/bin/sr
+ADD /run /usr/local/bin/run
+ADD /cleanup-data /usr/local/bin/cleanup-data
 
-CMD /usr/local/bin/sr
+CMD /usr/local/bin/run
