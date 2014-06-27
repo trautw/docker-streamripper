@@ -14,12 +14,8 @@ startstream () {
 }
 
 start () {
-  cd "$CONFDIR"
-  for STREAM in  *.urls; do
-    ls -la
-    ls -l "$STREAM"
-    echo "A${STREAM}A"
-    . "$CONFDIR/$STREAM"
+  for STREAM in  $CONFDIR/*.urls; do
+    . "$STREAM"
     startstream "$NAME" "$URL"
   done
 }
@@ -30,3 +26,4 @@ while true; do
   date
   sleep 60
 done
+

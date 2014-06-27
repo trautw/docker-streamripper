@@ -36,9 +36,8 @@ class Default < Thor
   desc 'restart','All in one'
   def restart
     run "thor app_image_build"
-    run "thor app_kill"
+    run "thor app_stop"
     run "thor app_start"
-    run "thor show_samplecall"
   end
 
   # Config
@@ -142,23 +141,17 @@ EOM"
     run "#{$docker} run --interactive=true --tty=true --rm --volumes-from #{$config_container_name} --volumes-from #{$data_container_name} --name #{$app_container_name} -P #{$app_image} /bin/bash"
   end
 
-  desc 'app_kill', "Kill #{$app_name}"
-  def app_kill
-    run "#{$docker} stop #{$app_name}"
+  desc 'app_stop', "Stop #{$app_name}"
+  def app_stop
+    run "#{$docker} stop #{$app_container_name}"
     sleep 10
-    run "#{$docker} kill #{$app_name}"
-    run "#{$docker} rm   #{$app_name}"
+    run "#{$docker} kill #{$app_container_name}"
+    run "#{$docker} rm   #{$app_container_name}"
   end
 
   desc 'show_samplecall', "show how to use #{$app_name}"
   def show_samplecall
-    ssh_host = "#{$app_name}.#{$env}.#{$domain}"
-    ssh_hostip = `dig +short @#{$dns} #{ssh_host}`.chomp
-    ssh_port = `#{$docker} port sshd 22`.split(':')[1].chomp
-    docker_host = `. ../env.source;echo $DOCKER_HOST`.split('/')[2].split(':')[0]
-    puts "ssh -p #{ssh_port} root@#{ssh_host}"
-    puts "ssh -p #{ssh_port} root@#{ssh_hostip}"
-    puts "ssh -p #{ssh_port} root@#{docker_host}"
+    puts "No samples yet."
   end
 
 end
