@@ -2,4 +2,14 @@
 #
 # logrotate
 ls -la
+cat /etc/hosts
 echo Logrotate simulation done
+mount -a
+mkdir /volume/host
+ip addr
+apt-get -y install nfs-kernel-server 
+apt-get -y install nfs-utils 
+modprobe nfs
+# mount -t nfs ds2:/volume1/Medien /volume/host
+mount 192.168.6.143:/volume1/Medien /volume/host
+ls -la /volume/host

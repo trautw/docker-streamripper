@@ -117,7 +117,8 @@ EOM"
 
   desc 'data_container_cleanup', 'Cleanup data container'
   def data_container_cleanup
-    run "#{$docker} run --rm --volumes-from #{$config_container_name} --volumes-from #{$data_container_name} #{$app_image} /bin/sh -c /usr/local/bin/cleanup-data"
+    run "cd smb; #{$docker} build -t smb_image ."
+    run "#{$docker} run  --interactive=true --tty=true --rm --privileged  --volumes-from #{$config_container_name} --volumes-from #{$data_container_name} --name smb_image_conatiner smb_image"
   end
 
   desc 'data_container_shell', 'Shell to data container'

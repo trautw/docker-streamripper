@@ -1,0 +1,50 @@
+#!/bin/sh
+# set -x 
+ping -c 3 ds2.skweg24.chtw.de
+
+SMB_USER=
+SMB_PASSWD=
+SMB_SHARE=
+. /volume/config/archive.conf
+mount -t cifs -o user=$SMB_USER -o password=$SMB_PASSWD $SMB_SHARE /volume/archive
+
+cd /volume/data
+DESTBASE=/volumes/archive/Pack/music/streamripper/mp3
+
+find . -type d -name incomplete| while read DIR; do
+  find . -mtime +1 -name "*.mp3" -exec /bin/rm -- {} \;
+done
+find . -type d | while read DIR; do
+  if [ "`basename \"$DIR\"`" != "incomplete" -a "$DIR" != "." ]; then
+    echo "DIR=$DIR"
+    # pushd "$DIR" >/dev/null
+    OLDDIR="`pwd`"
+    cd "$DIR"
+    # find . -name "*mp3" 
+    # echo mv *.mp3 $DEST
+    for FNAME in *.mp3; do
+      if [ -f "$FNAME" ]; then
+        # echo Processing "$FNAME"
+        DEST=$DESTBASE/`echo "$FNAME"|cut -c1-2`
+        mkdir -p "$DEST"
+        if [ -f "$DEST/$FNAME" ]; then
+          FROMSIZE=`ls -l -- "$FNAME" | awk '{ print $5 }'`
+          TOSIZE=`ls -l -- "$DEST/$FNAME" | awk '{ print $5 }'`
+          # ls -l "$DEST/$FNAME"
+          # echo "FROMSIZE=$FROMSIZE TOSIZE=$TOSIZE"
+          if [ "$FROMSIZE" -gt "$TOSIZE" ]; then
+            echo Updating "$FNAME"
+            /bin/mv -- "$FNAME" "$DEST/$FNAME"
+          else
+            /bin/rm -- "$FNAME"
+          fi
+        else
+          echo "New: $FNAME"
+          /bin/mv -- "$FNAME" "$DEST/$FNAME"
+        fi
+      fi
+    done
+    # popd >/dev/null
+    cd "$OLDDIR"
+  fi
+done
