@@ -18,10 +18,22 @@ $data_container = "#{$app_name}data"
 $data_image = "#{user_name}/#{$data_container}"
 $data_container_name = "#{user_name}-#{$data_container}"
 
-$docker = "docker"
-$docker = ". $HOME/.docker.rc; docker" if File.file?("$HOME/.docker.rc")
-$docker = ". #{Dir.pwd}/../docker.rc; docker" if File.file?("#{Dir.pwd}/../docker.rc")
-$docker = ". #{Dir.pwd}/docker.rc; docker" if File.file?("#{Dir.pwd}/docker.rc")
+
+$docker = "/home/trautw/bin/docker-1.12"
+
+dirname = Dir.pwd
+while true do
+  ["docker.rc",".docker.rc"].each do |configfile|
+    if File.file?("#{dirname}/#{configfile}")
+      $docker_rc = "#{dirname}/#{configfile}"
+      break
+    end
+  end
+  break if $docker_rc || dirname == '/'
+  dirname = File.dirname(dirname)
+end
+
+$docker = ". #{$docker_rc}; #{$docker}" if $docker_rc
 
 $domain = "docker.szz.chtw.de"
 $env = "dev"
@@ -118,7 +130,7 @@ EOM"
   desc 'data_container_cleanup', 'Cleanup data container'
   def data_container_cleanup
     run "cd smb; #{$docker} build -t smb_image ."
-    run "#{$docker} run  --interactive=true --tty=true --rm --privileged  --volumes-from #{$config_container_name} --volumes-from #{$data_container_name} --name smb_image_conatiner smb_image"
+    run "#{$docker} run --tty=true --rm --privileged  --volumes-from #{$config_container_name} --volumes-from #{$data_container_name} --name smb_image_conatiner smb_image"
   end
 
   desc 'data_container_shell', 'Shell to data container'

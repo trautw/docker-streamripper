@@ -1,0 +1,7 @@
+#!/bin/sh
+TOOLROOT=$HOME/Projekte/docker/docker-streamripper
+cd $TOOLROOT
+thor :restart 2>&1
+echo FromStdout
+echo FromErr >&2
+sleep 10

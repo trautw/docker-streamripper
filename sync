@@ -1,0 +1,7 @@
+#!/bin/sh
+TOOLROOT=$HOME/Projekte/docker/docker-streamripper
+cd $TOOLROOT
+thor :data_container_cleanup
+echo FromStdout
+echo FromErr >&2
+sleep 10
